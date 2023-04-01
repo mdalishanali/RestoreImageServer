@@ -1,0 +1,46 @@
+const fetch = require("node-fetch");
+
+const replicateImage = async (imageUrl, scale = 2) => {
+  let startResponse = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Token " + process.env.REPLICATE_API_KEY,
+    },
+    body: JSON.stringify({
+      version:
+        "9283608cc6b7be6b65a8e44983db012355fde4132009bf99d976b2f0896856a3",
+      input: { img: imageUrl, version: "v1.4", scale: scale },
+    }),
+  });
+
+  let jsonStartResponse = await startResponse.json();
+  let endpointUrl = jsonStartResponse.urls.get;
+
+  // GET request to get the status of the image restoration process & return the result when it's ready
+  let restoredImage = null;
+  while (!restoredImage) {
+    // Loop in 1s intervals until the alt text is ready
+    console.log("polling for result...");
+    let finalResponse = await fetch(endpointUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Token " + process.env.REPLICATE_API_KEY,
+      },
+    });
+    let jsonFinalResponse = await finalResponse.json();
+
+    if (jsonFinalResponse.status === "succeeded") {
+      console.log('jsonFinalResponse: ', jsonFinalResponse);
+      restoredImage = jsonFinalResponse.output;
+    } else if (jsonFinalResponse.status === "failed") {
+      break;
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+  return restoredImage;
+};
+
+module.exports = { replicateImage };
