@@ -3,14 +3,24 @@ const express = require("express");
 const app = express();
 
 app.use(express.json());
-app.use(cors());
 
 const cors = require("cors");
+app.use(cors());
 
 const imageRoutes = require("./routes/image.routes");
 
-
 app.use("/api/image", imageRoutes);
+app.get("/", (req, res) => {
+  const html = `
+  <!DOCTYPE html>
+  <html>
+    <body>
+      <p>This is api for image restoration!</p>
+    </body>
+  </html>
+`;
+  res.send(html);
+});
 
 const port = process.env.PORT;
 app.listen(port, () => {
