@@ -10,6 +10,7 @@ app.use(cors());
 const imageRoutes = require("./routes/image.routes");
 
 app.use("/api/image", imageRoutes);
+
 app.get("/", (req, res) => {
   const html = `
   <!DOCTYPE html>
@@ -22,7 +23,7 @@ app.get("/", (req, res) => {
   res.send(html);
 });
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
   console.log(
     `Listening on Port ${port} and running in ${process.env.NODE_ENV}`

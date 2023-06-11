@@ -21,7 +21,6 @@ const replicateImage = async (imageUrl, scale = 2) => {
   let restoredImage = null;
   while (!restoredImage) {
     // Loop in 1s intervals until the alt text is ready
-    console.log("polling for result...");
     let finalResponse = await fetch(endpointUrl, {
       method: "GET",
       headers: {
@@ -32,7 +31,6 @@ const replicateImage = async (imageUrl, scale = 2) => {
     let jsonFinalResponse = await finalResponse.json();
 
     if (jsonFinalResponse.status === "succeeded") {
-      console.log('jsonFinalResponse: ', jsonFinalResponse);
       restoredImage = jsonFinalResponse.output;
     } else if (jsonFinalResponse.status === "failed") {
       break;
